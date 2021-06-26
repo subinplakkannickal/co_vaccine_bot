@@ -1,20 +1,21 @@
 import requests
-from data import utils
+from utils import utils, url
 
 class SearchByDistrict(object):
     """ Class for search vaccination slots by district.
     """
-    def __init__(self) -> None:
-        self._calendar_by_district_url="https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id={}&date={}&vaccine={}"
-        self._get_states_url="https://cdn-api.co-vin.in/api/v2/admin/location/states"
-        self._get_district_id_url="https://cdn-api.co-vin.in/api/v2/admin/location/districts/{}"
-        self._header = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'}
+    def __init__(self):
+        self._calendar_by_district_url = url.CALENDAR_BY_DISTICT_URL
+        self._get_states_url = url.GET_STATES_URL
+        self._get_district_id_url = url.GET_DISTRICT_ID_URL
+        self._header = url.HEADER
         self.warning = None
 
     def get_states(self):
         """ Get states in id order.
         """
         response = requests.get( self._get_states_url, headers=self._header)
+
         if response.status_code == 200:
             states = response.json()["states"]
             unordered_states = {state["state_id"]: state["state_name"] for state in states}
@@ -33,6 +34,7 @@ class SearchByDistrict(object):
         """ Get districts of given state in id order.
         """
         response = requests.get( self._get_district_id_url.format(state_id), headers=self._header)
+
         if response.status_code == 200:
             districts = response.json()["districts"]
             unordered_districts = {district["district_id"]: district["district_name"] for district in districts}
@@ -54,7 +56,9 @@ class SearchByDistrict(object):
             vaccine_type : str
         """
         date = utils.get_today()
-        response = requests.get( self._calendar_by_district_url.format(district_id, date, vaccine_type), headers=self._header)
+        response = requests.get( self._calendar_by_district_url.format(
+            district_id, date, vaccine_type), headers=self._header)
+            
         if response.status_code == 200:
             return response.json()
 

@@ -1,29 +1,13 @@
 import sys
 import time
-from utilities import column_print, flash_message, message, warning
+from utils.utils import (
+    flash_message, message, warning, select_vaccine_type
+    )
 from data.search_by_pincode import SearchByPincode
 
 class SearchVaccineSlotesByPincode(object):
     def __init__(self, ):
         self.search_by_pincode_data = SearchByPincode()
-
-    def select_vaccine_type(self):
-        """ User interface for vaccine type.
-        """
-        available_vaccine_types = {1 : "COVISHIELD", 2 : "COVAXINE", 3 : "SPUTNIK V"}
-
-        # Display vaccne type list as table
-        column_print(["{}: {}".format(id, available_vaccine_types[id]) for id in available_vaccine_types.keys()])
-
-        vaccine_type = input("Enter vaccine type: ")
-
-        # validate user input
-        if vaccine_type.isnumeric() and int(vaccine_type) in available_vaccine_types:
-            message("Vaccine type {} selected".format(available_vaccine_types[int(vaccine_type)]))
-            return available_vaccine_types[int(vaccine_type)]
-        else:
-            message("{} selected".format(available_vaccine_types[1]))
-            return available_vaccine_types[1]
 
     def get_vaccine_slots(self):
         slots = [self.search_by_pincode_data.get_api_data_by_pincode_for_7days(
@@ -73,10 +57,15 @@ class SearchVaccineSlotesByPincode(object):
 
         return pincode_list
 
-    def get_user_inputs(self):
-        self.vaccine_type = self.select_vaccine_type()
+    def get_user_inputs(self, vaccine_type=None, pincode=None):
+        """ Get user input for select pincode
+        args:
+            vaccine_type: str, optional
+            pincode: list, optional
+        """
+        self.vaccine_type = vaccine_type if vaccine_type else select_vaccine_type()
 
-        self.pincode = self.get_pincode()
+        self.pincode = pincode if pincode else self.get_pincode()
         if not self.pincode: 
             warning("No pincode selected")
             return 0
