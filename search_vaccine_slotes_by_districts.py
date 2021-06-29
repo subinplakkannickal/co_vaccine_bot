@@ -53,9 +53,11 @@ class SearchVaccineSlotesByDistricts(object):
         else:
             return 0
 
-    def get_vaccine_slots(self):
+    def get_vaccine_slots(self, district_id, vaccine_type):
+        """
+        """
         slots = self.search_by_district_data.get_api_data_by_district_id_for_7days(
-            self.district_id, self.vaccine_type
+            district_id, vaccine_type
             )
         if not slots:
             warning(self.search_by_district_data.warning)
@@ -88,31 +90,30 @@ class SearchVaccineSlotesByDistricts(object):
             vaccine_type : str, optional
             district: int, optional
         """
-        self.vaccine_type = vaccine_type if vaccine_type else select_vaccine_type()
+        if vaccine_type:
+            vaccine_type = select_vaccine_type()
 
-        if district:
-            self.district_id = district
-        else:
-            self.state_id = self.select_state()
-            if not self.state_id: 
+        if not district:
+            state_id = self.select_state()
+            if not state_id: 
                 warning("Invalid state selected")
-                return 0
+                return 0, vaccine_type
 
-
-            self.district_id = self.select_district(self.state_id)
-            if not self.district_id: 
+            district_id = self.select_district(self.state_id)
+            if not district_id: 
                 warning("Invalid district selected")
-                return 0
+                return 0, vaccine_type
         
-        return 1
+        return district_id, vaccine_type
 
 
 if __name__ == "__main__":
     try:
         main = SearchVaccineSlotesByDistricts()
-        if main.get_user_inputs():
+        district_id, vaccine_type = main.get_user_inputs()
+        if district_id and vaccine_type:
             while True:
-                result = main.get_vaccine_slots()
+                result = main.get_vaccine_slots(district_id, vaccine_type)
                 for item in result:
                     if item["available_capacity"]:
                         message("""Center: {}

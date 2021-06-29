@@ -1,6 +1,5 @@
-from utilities import message
 import requests
-from utils import url
+from utils import utils, url
 
 class Authentication(object):
     def __init__(self):
@@ -18,7 +17,7 @@ class Authentication(object):
         response = requests.post(url=self._generate_otp_url, json=data, headers=self._header)
 
         if response.status_code == 200:
-            message(response)
+            utils.message(response)
             return response.json()
 
         elif response.status_code == 400:

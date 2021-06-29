@@ -1,7 +1,7 @@
 import sys
 import time
 from utils.utils import (
-    flash_message, message, warning, select_vaccine_type
+    flash_message, get_api_response, message, warning, select_vaccine_type
     )
 from data.search_by_pincode import SearchByPincode
 
@@ -9,10 +9,11 @@ class SearchVaccineSlotesByPincode(object):
     def __init__(self, ):
         self.search_by_pincode_data = SearchByPincode()
 
-    def get_vaccine_slots(self):
+    def get_vaccine_slots(self, pincode, vaccine_type):
         slots = [self.search_by_pincode_data.get_api_data_by_pincode_for_7days(
-            pincode, self.vaccine_type
-            ) for pincode in self.pincode]
+            _pincode, self.vaccine_type
+            ) for _pincode in pincode]
+
         if not slots:
             warning(self.search_by_pincode_data.warning)
             return 0
@@ -43,14 +44,17 @@ class SearchVaccineSlotesByPincode(object):
         """ User interfce to get pincode.
         """
         pincode_list = []
+        pincode = input("Enter pincode: ")
         while True:
-            pincode = input("Enter pincode: ")
             if pincode.isnumeric and len(pincode) == 6:
                 pincode_list.append(pincode)
             else:
                 warning("invalid pincode")
 
-            if not input("Do you want search for more pincode? y/n ") == 'y':
+            pincode = input(
+                "Do you want search for more pincode? Enter pincode if yes else n (Default n) "
+                )
+            if not pincode or pincode == 'n':
                 break
 
         message("Selected pincodes: {}".format(", ".join(pincode_list)))
@@ -63,22 +67,25 @@ class SearchVaccineSlotesByPincode(object):
             vaccine_type: str, optional
             pincode: list, optional
         """
-        self.vaccine_type = vaccine_type if vaccine_type else select_vaccine_type()
+        if not vaccine_type:
+            vaccine_type = select_vaccine_type()
 
-        self.pincode = pincode if pincode else self.get_pincode()
-        if not self.pincode: 
-            warning("No pincode selected")
-            return 0
+        if not pincode:
+            pincode = self.get_pincode()
+
+        if not pincode:
+            warning("Invalid pincode selected")
         
-        return 1
+        return pincode, vaccine_type
 
 
 if __name__ == "__main__":
     try:
         main = SearchVaccineSlotesByPincode()
-        if main.get_user_inputs():
+        pincode, vaccine_type = main.get_user_inputs()
+        if pincode and vaccine_type:
             while True:
-                result = main.get_vaccine_slots()
+                result = main.get_vaccine_slots(pincode, vaccine_type)
                 for item in result:
                     if item["available_capacity"]:
                         message("""Center: {}

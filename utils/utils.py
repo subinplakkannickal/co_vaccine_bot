@@ -2,6 +2,7 @@ import datetime
 import requests
 import os
 import time
+from collections import namedtuple
 
 
 def _columnify(iterable):
@@ -59,25 +60,36 @@ def get_today():
     today = datetime.date.today()
     return today.strftime("%d-%m-%Y")
 
-def get_api_response(url, header):
+def get_api_response(url, headers):
     """ Utility function to get api response and handle exceptions
     args:
         url: str
         header: dict
     """
-    response = requests.get( url, headers=header)
+    Response = namedtuple("Response", ["status_code", "response", "warning"])
+    response = requests.get( url, headers=headers)
 
     if response.status_code == 200:
-        return {"response" : response.json(), "warning": "Bad Request"}
+        status_code = 200
+        response = response.json()
+        warning = None
 
     elif response.status_code == 400:
-        return {"response" : 0, "warning": "Bad Request"}
+        status_code = 400
+        response = 0
+        warning = "Bad Request"
 
     elif response.status_code == 401:
-        return {"response" : 0, "warning": "Unauthenticated access"}
+        status_code = 401
+        response = 0
+        warning = "Unauthenticated access"
 
     elif response.status_code == 500:
-        return {"response" : 0, "warning": "Internal Server Error"}
+        status_code = 500
+        response = 0
+        warning = "Internal Server Error"
+    
+    return Response(status_code, response, warning)
 
 def select_vaccine_type():
     """ User interface for vaccine type.

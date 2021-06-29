@@ -1,4 +1,3 @@
-import requests
 from utils import utils, url
 class SearchByPincode(object):
     """ Class for search vaccination slots by pincode.
@@ -15,20 +14,12 @@ class SearchByPincode(object):
             vaccine_type : str
         """
         date = utils.get_today()
-        response = requests.get( self._calendar_by_pincode_url.format(
+        response = utils.get_api_response( self._calendar_by_pincode_url.format(
             pincode, date, vaccine_type), headers=self._header)
             
-        if response.status_code == 200:
-            return response.json()
+        if response.response:
+            return response.response
 
-        elif response.status_code == 400:
-            self.warning = "Bad Request"
-            return 0
-
-        elif response.status_code == 401:
-            self.warning = "Unauthenticated access"
-            return 0
-
-        elif response.status_code == 500:
-            self.warning = "Internal Server Error"
+        else:
+            self.warning = response.warning
             return 0
