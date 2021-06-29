@@ -3,9 +3,10 @@ import time
 from utils.utils import (
     flash_message, get_api_response, message, warning, select_vaccine_type
     )
+from abstract_slot_search import AbstractSlotSearch
 from data.search_by_pincode import SearchByPincode
 
-class SearchVaccineSlotesByPincode(object):
+class SearchVaccineSlotesByPincode(AbstractSlotSearch):
     def __init__(self, ):
         self.search_by_pincode_data = SearchByPincode()
 

@@ -13,13 +13,13 @@ class CoVaccineBot(object):
         self.authentication = Authentication()
         self.user_data = {
             "token" : None,
-            "auto_book" : False,
+            "auto_book" : None,
             "vaccine_type" : None,
             "fee_type" : 0,
             "pincode" : [],
-            "state" : 0,
             "district" : 0,
-            "search_option" : 2
+            "search_option" : 2,
+            "search_freq" : 0
         }
 
     def read_json(self, mobile_number):
@@ -79,14 +79,14 @@ class CoVaccineBot(object):
         else:
             user_data = deepcopy(self.user_data)
 
-        token = user_data["token"]
-        vaccine_type = user_data["vaccine_type"]
-        auto_book = user_data["auto_book"]
-        fee_type = user_data["fee_type"]
-        pincode = user_data["pincode"]
-        state = user_data["state"]
-        district = user_data["district"]
-        search_option = user_data["search_option"]
+        token = user_data["token"] if "token" in user_data else None
+        vaccine_type = user_data["vaccine_type"] if "vaccine_type" in user_data else None
+        auto_book = user_data["auto_book"] if "auto_book" in user_data else None
+        fee_type = user_data["fee_type"] if "fee_type" in user_data else None
+        pincode = user_data["pincode"] if "pincode" in user_data else None
+        district = user_data["district"] if "district" in user_data else None
+        search_option = user_data["search_option"] if "search_option" in user_data else None
+        search_freq = user_data["search_freq"] if "search_freq" in user_data else None
         
         if not token:
             utils.warning("Token not found in preferences")
@@ -98,6 +98,23 @@ class CoVaccineBot(object):
             vaccine_type = utils.select_vaccine_type()
             self.user_data["vaccine_type"] = vaccine_type
 
+        if not fee_type:
+            utils.warning("Fee type not found in preferences")
+            if input("Are you prefer free vaccine? y/n (Default n) ") == "y":
+                fee_type = "free"
+            else:
+                fee_type = "paid"
+            self.user_data["fee_type"] = fee_type
+
+        if not search_freq:
+            utils.warning("Search frequency not found in preferences")
+            search_freq = input("How frequently you want search? (in sec) ")
+            if search_freq.isnumeric:
+                search_freq = int(search_freq)
+            else:
+                search_freq = 60
+            self.user_data["search_freq"] = search_freq
+
         if not search_option:
             utils.warning("Search option not found in preferences")
             search_option = input("Seach by: \n\t1. PINCODE\t2. District: (Default 2) ")
@@ -107,24 +124,35 @@ class CoVaccineBot(object):
 
             self.user_data["search_option"] = int(search_option)
 
-        if search_option == 1:
-            self.search = SearchVaccineSlotesByDistricts()
-        else:
-            self.search = SearchVaccineSlotesByPincode()
-
         if search_option == 1 and not district:
             utils.warning("Preferred district not found")
-            
+            search = SearchVaccineSlotesByDistricts()
+            state = search.select_state()
+            if state:
+                district = search.select_district(state)
+            self.user_data["district"] = district
+            # search.get_vaccine_slots(district, vaccine_type)
 
         elif search_option == 2 and not pincode:
             utils.warning("Preferred pincode not found.")
-            pincode = self.search.get_pincode()
+            search = SearchVaccineSlotesByPincode()
+            pincode = search.get_pincode()
             self.user_data["pincode"] = pincode
+            # search.get_vaccine_slots(pincode, vaccine_type)
             
+        if not auto_book:
+            utils.warning("Auto book option not enabled")
+            if input("Do you want enable auto book option? y/n (Default n) ") == "y":
+                auto_book = "y"
+            else:
+                auto_book = "n"
+
+            self.user_data["auto_book"] = auto_book
 
         if not self.user_data == user_data:
             if input("Do you want update preferences? y/n (Default n) ") == "y":
                 self.update_json(mobile_number, self.user_data)
+
 
         
 

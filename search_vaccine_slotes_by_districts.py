@@ -3,9 +3,11 @@ import time
 from utils.utils import (column_print, 
     flash_message, message, warning, select_vaccine_type
     )
+from abstract_slot_search import AbstractSlotSearch
 from data.search_by_district import SearchByDistrict
 
-class SearchVaccineSlotesByDistricts(object):
+
+class SearchVaccineSlotesByDistricts(AbstractSlotSearch):
     def __init__(self, ):
         self.search_by_district_data = SearchByDistrict()
 
