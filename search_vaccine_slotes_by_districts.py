@@ -23,7 +23,7 @@ class SearchVaccineSlotesByDistricts(AbstractSlotSearch):
         column_print(["{}: {}".format(id, states[id]) for id in states.keys()])
 
         # Reading user input
-        state_id = input("Enter state id: ")
+        state_id = input("\nEnter state id: ")
 
         # validate user input
         if state_id.isnumeric() and int(state_id) in states:
@@ -46,7 +46,7 @@ class SearchVaccineSlotesByDistricts(AbstractSlotSearch):
         column_print(["{}: {}".format(id, districts[id]) for id in districts.keys()])
 
         # Reading user input
-        district_id = input("Enter district id: ")
+        district_id = input("\nEnter district id: ")
 
         # validate user input
         if district_id.isnumeric() and int(district_id) in districts:

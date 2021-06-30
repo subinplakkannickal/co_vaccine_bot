@@ -1,7 +1,7 @@
 import sys
 import time
 from utils.utils import (
-    flash_message, get_api_response, message, warning, select_vaccine_type
+    flash_message, message, warning, select_vaccine_type
     )
 from abstract_slot_search import AbstractSlotSearch
 from data.search_by_pincode import SearchByPincode
@@ -12,7 +12,7 @@ class SearchVaccineSlotesByPincode(AbstractSlotSearch):
 
     def get_vaccine_slots(self, pincode, vaccine_type):
         slots = [self.search_by_pincode_data.get_api_data_by_pincode_for_7days(
-            _pincode, self.vaccine_type
+            _pincode, vaccine_type
             ) for _pincode in pincode]
 
         if not slots:
@@ -47,7 +47,7 @@ class SearchVaccineSlotesByPincode(AbstractSlotSearch):
         pincode_list = []
         pincode = input("Enter pincode: ")
         while True:
-            if pincode.isnumeric and len(pincode) == 6:
+            if pincode.isnumeric() and len(pincode) == 6:
                 pincode_list.append(pincode)
             else:
                 warning("invalid pincode")
