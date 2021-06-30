@@ -140,14 +140,15 @@ class CoVaccineBot(object):
 
             search_param = pincode
             
-        if not auto_book:
-            if prefernce: utils.warning("Auto book option not enabled")
-            if input("Do you want enable auto book option? y/n (Default n) ") == "y":
-                auto_book = "y"
-            else:
-                auto_book = "n"
+        # Auto book option disabled
+        # if not auto_book:
+        #     if prefernce: utils.warning("Auto book option not enabled")
+        #     if input("Do you want enable auto book option? y/n (Default n) ") == "y":
+        #         auto_book = "y"
+        #     else:
+        #         auto_book = "n"
 
-            self._preference_modified = True
+        #     self._preference_modified = True
 
         if self._preference_modified:
             if input("Do you want update preferences? y/n (Default n) ") == "y":
@@ -175,7 +176,6 @@ class CoVaccineBot(object):
                 district, search_freq
             )
         )
-
 
         while True:
             result = search.get_vaccine_slots(search_param, vaccine_type)
@@ -226,7 +226,6 @@ Available Slots:{}
         
         utils.message("Succesfull OTP verified.")
         return response["token"]
-
 
 
 if __name__ == "__main__":
